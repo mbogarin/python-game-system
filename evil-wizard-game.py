@@ -156,7 +156,13 @@ def create_character():
     print("3. Archer") 
     print("4. Paladin")  
 
-    class_choice = input("\nEnter the number of your class choice: ")
+    # KeyboardInterrup error catch:
+    try:
+        class_choice = input("\nEnter the number of your class choice: ")
+    except KeyboardInterrupt:
+        print("\n\nGame interrupted. Goodbye!\n")
+        exit()
+        
     name = input("\nEnter your character's name: ")
 
     if class_choice == '1':
@@ -242,7 +248,7 @@ def battle(player, wizard):
             player.heal()
           
         elif choice == '4':
-            player.display_stats() # ! not passing.
+            player.display_stats() 
             
         else:
             print("\nInvalid choice. Try again...\n")
