@@ -10,57 +10,49 @@ class Character:
         self.health = health
         self.attack_power = attack_power
         self.max_health = health  
-        
-        # Temporary states (boolean flag) - Note: tracks the character's state across turns (store & check later in attack method since this affects future actions).
         self.is_evading = False 
         self.is_blocking = False 
         self.is_frozen = False
         
 
     # !> METHODS:
-    # Step 4: Modify: Randomize attack damage
+    
+    # =! CENTRAL DAMAGE SYSTEM:
+    def take_damage(self, damage, attacker):
+        
+        # Evade defense:
+        if self.is_evading:
+            print(f"{self.name} evaded the attack!")
+            self.is_evading = False # reset
+            return
+        
+        # Block defense: 
+        if self.is_blocking:
+          print(f"{self.name} blocked the attack!")
+          self.is_blocking = False
+          return
+        
+        self.health -= damage
+        print(f"{attacker.name} deals {damage} damage to {self.name}!")
+        
     # ATTACK:
     def attack(self, opponent):
+        
+        # - (Step 4: Randomize attack damage):
         damage = random.randint(self.attack_power - 5, self.attack_power + 5)
-
-        # Freeze attack:
-        if self.is_frozen:
-          print(f"- {self.name} is frozen and cannot attack!")
-          self.is_frozen = False # reset
-          return
+        opponent.take_damage(damage, self)
           
-        # Evade attack:
-        if opponent.is_evading:
-          print(f"{opponent.name} evaded the attack!")
-          opponent.is_evading = False
-          return
-        
-        # Block attack: 
-        if opponent.is_blocking:
-          print(f"{opponent.name} blocked the attack!")
-          opponent.is_blocking = False
-          return
-      
-        # # show player's health status after attack:
-        # def player_health(self):
-        #     print(f"{self.name} ")
-        
-        opponent.health -= damage
-        print(f"{self.name} attacks {opponent.name} for {damage} damage!")
-        
-        if opponent.health <= 0:
-            print(f"{opponent.name} has been defeated!")
+ 
          
 # - (Step 3: Add Healing Mechanic:)
     # HEAL:
     def heal(self):
         heal_amount = 20
         self.health = min(self.health + heal_amount, self.max_health)
-        print(f"\n{self.name} heals for {heal_amount}! Current health: {self.health}/{self.max_health}")
+        print(f"\n{self.name} heals for {heal_amount} HP! ({self.health}/{self.max_health})")
 
     # DISPLAY STATS:
     def display_stats(self):
-        # print(f"\n{self.name}'s Stats - Health: {self.health}/{self.max_health}, Attack Power: {self.attack_power} ")
         print(f"\n{self.name}'s Stats:")
         print(f"Health: {self.health}/{self.max_health}")
         print(f"Attack Power: {self.attack_power}")
@@ -69,66 +61,59 @@ class Character:
 # [Warrior class (inherits from Character)]
 class Warrior(Character):
     def __init__(self, name):
-        super().__init__(name, health=140, attack_power=25)
+        super().__init__(name, 140, 25)
         
-    # Unique abilities:
+    # Special abilities:
     # 1. Power Strike
     def power_strike(self, opponent):
         damage = self.attack_power + 15
-        opponent.health -= damage
-        print(f"\n{self.name} uses Power Strike for {damage} damage!")
+        print(f"\n{self.name} uses Power Strike!")
+        opponent.take_damage(damage,self)
+        
+        
         
     # 2. Berserk (w/ risk factor)
     def berserk(self, opponent):
         damage = self.attack_power + 25
         self.health -= 10  # risk factor
-        opponent.health -= damage
-        print(f"\n{self.name} goes Berserk! Deals {damage} damage but loses 10 health!")
+        print(f"\n{self.name} goes Berserk! Loses 10 HP!")
+        opponent.take_damage(damage,self)
 
 
 # [Mage class (inherits from Character)]
 class Mage(Character):
     def __init__(self, name):
-        super().__init__(name, health=100, attack_power=35)
+        super().__init__(name, 100, 35)
         
     
     # Unique abilities:
     # 1. Fireball
     def fireball(self, opponent):
         damage = self.attack_power + 20
-        opponent.health -= damage
-        print(f"\n{self.name} casts Fireball for {damage} damage!")
+        print(f"\n{self.name} casts Fireball!")
+        opponent.take_damage(damage,self)
+        
         
     # 2. Freeze
     def freeze(self, opponent):
         opponent.is_frozen = True
-        print(f"{self.name} freezes {opponent.name}! They can't attack next turn!")
-        
+        print(f"\n{self.name} freezes {opponent.name}! They can't attack next turn!")
     
-
-# [EvilWizard class (inherits from Character)]
-
-# Step 6: Evil wizard logic: regenerate health & attack player after each turn.
-class EvilWizard(Character):
-    def __init__(self, name):
-        super().__init__(name, health=150, attack_power=15)
-
-    def regenerate(self):
-        self.health += 5
-        print(f"{self.name} regenerates 5 health! Current health: {self.health}/{self.max_health}")
+        
 
 # Steps 1-2: Add 2 new character classes + 2 unique abilities for each.
 # + Create Archer class
 class Archer(Character):
     def __init__(self, name):
-        super().__init__(name, health=120, attack_power=30)
+        super().__init__(name, 120, 30)
+        
       
   # Unique abilities:
     # 1. Quick Shot - double arrow attack. 
     def quick_shot(self, opponent):
         damage = self.attack_power * 2
-        opponent.health -= damage
-        print(f"\n{self.name} uses Quick Shot for {damage} damage!")
+        print(f"\n{self.name} uses Quick Shot!")
+        opponent.take_damage(damage,self)
       
     # 2. Evade - evades next attack.
     def evade(self):
@@ -138,14 +123,14 @@ class Archer(Character):
 # + Create Paladin class 
 class Paladin(Character):
     def __init__(self, name):
-        super().__init__(name, health=170, attack_power=20)
+        super().__init__(name, 170, 20)
 
   # Unique abilities:
     # 1. Holy Strike - bonus damage.
     def holy_strike(self, opponent):
         damage = self.attack_power + 10
-        opponent.health -= damage
-        print(f"\n{self.name} uses Holy Stike for {damage} damage!")
+        print(f"\n{self.name} uses Holy Strike!")
+        opponent.take_damage(damage,self)
       
       
     # 2. Divine Shield - blocks next attack.
@@ -154,7 +139,20 @@ class Paladin(Character):
         print(f"\n{self.name} activates Divine Shield!")
   
   
-# [Menu System]
+  # [EvilWizard class (inherits from Character)]
+
+# - (Step 6: Evil wizard logic): regenerate health & attack player after each turn.
+class EvilWizard(Character):
+    def __init__(self, name):
+        super().__init__(name, 150, 15)
+        
+
+    def regenerate(self):
+        self.health = min(self.health + 5, self.max_health)
+        print(f"{self.name} regenerates 5 HP! (Current: {self.health}/{self.max_health})")
+        
+  
+# [MENU SYSTEM]:
 
 # !> 1. CREATE CHARACTER:
 def create_character():
@@ -167,6 +165,7 @@ def create_character():
     # KeyboardInterrup error catch:
     try:
         class_choice = input("\nEnter the number of your class choice: ")
+        
     except KeyboardInterrupt:
         print("\n\nGame interrupted. Goodbye!\n")
         exit()
@@ -201,7 +200,7 @@ def battle(player, wizard):
         
         choice = input("\nChoose an action: ")
 
-        # =! Step 5: Build Turn-Based Battle System:
+        # - (Step 5: Build Turn-Based Battle System):
         if choice == '1':
             print("\n")
             player.attack(wizard)
@@ -290,26 +289,38 @@ def battle(player, wizard):
         else:
             print("\nInvalid choice. Try again...\n")
 
-        if wizard_action:
-            wizard.regenerate()
-            wizard.attack(player)
-            wizard_action = False # reset
+        if wizard_action and wizard.health > 0:
+            
+            if wizard.is_frozen:
+                print(f"{wizard.name} is frozen and cannot act!")
+                wizard.is_frozen = False
+                wizard_action = False
+            else:
+                wizard.regenerate()
+                wizard.attack(player)
+                wizard_action = False # reset
             
             # Show player stats after wizard's turn:
-            print(f"\n{player.name}'s current health: {player.health}/{player.max_health}")
+            print(f"\n({player.name}'s current health: {player.health}/{player.max_health})")
             
             separator()
         
     
-    # =! Step 7: Victory/Defeat Messages:
+# - (Step 7: Victory/Defeat Messages):
         if player.health <= 0:
-            print(f"\n{player.name} has been defeated!")
-            print("\n=== GAME OVER ===\n")
+            print(f"\n\n\n======================== GAME OVER =========================\n")
+            print(f"\n                {player.name} has been defeated!")
+            print("\n============================================================\n\n\n")
             break
 
-    if wizard.health <= 0:
-        print("\n=== GAME OVER ===")
-        print(f"\n{wizard.name} has been defeated by {player.name}!\n\n")
+        elif wizard.health <= 0:
+            print(f"\n\n\n======================== GAME OVER =========================\n")
+            print(f"     Victory! {wizard.name} has been defeated by {player.name}!")
+            print("\n============================================================\n\n\n")
+            break
+            
+        
+
     
 
 # !> MAIN FUNCTION:
