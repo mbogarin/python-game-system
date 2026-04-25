@@ -3,76 +3,70 @@ import random   # To randomize attack damage
 def separator():
     print("=" * 60)
     
-# [Base Character class]
+# BASE CHARACTER CLASS:
 class Character:
     def __init__(self, name, health, attack_power):
         self.name = name
         self.health = health
         self.attack_power = attack_power
         self.max_health = health  
+        
+        # State Effects:
         self.is_evading = False 
         self.is_blocking = False 
         self.is_frozen = False
         
-
-    # !> METHODS:
-    
-    # =! CENTRAL DAMAGE SYSTEM:
+# METHODS (core combat logic):
+    # 1. CENTRAL DAMAGE SYSTEM:
     def take_damage(self, damage, attacker):
         
-        # Evade defense:
+        # 1. Evade defense:
         if self.is_evading:
             print(f"{self.name} evaded the attack!")
             self.is_evading = False # reset
             return
         
-        # Block defense: 
+        # 2. Block defense: 
         if self.is_blocking:
           print(f"{self.name} blocked the attack!")
           self.is_blocking = False
           return
         
+        # Health damage:
         self.health -= damage
         print(f"{attacker.name} deals {damage} damage to {self.name}!")
         
-    # ATTACK:
+    # 2. ATTACK:
     def attack(self, opponent):
-        
-        # - (Step 4: Randomize attack damage):
-        damage = random.randint(self.attack_power - 5, self.attack_power + 5)
+        damage = random.randint(self.attack_power - 5, self.attack_power + 5) # randomized damage.
         opponent.take_damage(damage, self)
           
- 
-         
-# - (Step 3: Add Healing Mechanic:)
-    # HEAL:
+
+    # 3. HEAL:
     def heal(self):
         heal_amount = 20
         self.health = min(self.health + heal_amount, self.max_health)
         print(f"\n{self.name} heals for {heal_amount} HP! ({self.health}/{self.max_health})")
 
-    # DISPLAY STATS:
+    # 4. DISPLAY STATS:
     def display_stats(self):
         print(f"\n{self.name}'s Stats:")
         print(f"Health: {self.health}/{self.max_health}")
         print(f"Attack Power: {self.attack_power}")
     
-
-# [Warrior class (inherits from Character)]
+# SUBCLASSES:
+# 1. Warrior class (inherits from Character)
 class Warrior(Character):
     def __init__(self, name):
         super().__init__(name, 140, 25)
         
-    # Special abilities:
-    # 1. Power Strike
+    # 1. Power Strike - extra damage.
     def power_strike(self, opponent):
         damage = self.attack_power + 15
         print(f"\n{self.name} uses Power Strike!")
         opponent.take_damage(damage,self)
         
-        
-        
-    # 2. Berserk (w/ risk factor)
+    # 2. Berserk - high damage but w/ health cost.
     def berserk(self, opponent):
         damage = self.attack_power + 25
         self.health -= 10  # risk factor
@@ -80,36 +74,29 @@ class Warrior(Character):
         opponent.take_damage(damage,self)
 
 
-# [Mage class (inherits from Character)]
+# 2. Mage class 
 class Mage(Character):
     def __init__(self, name):
         super().__init__(name, 100, 35)
         
-    
-    # Unique abilities:
-    # 1. Fireball
+    # 1. Fireball - strong attack.
     def fireball(self, opponent):
         damage = self.attack_power + 20
         print(f"\n{self.name} casts Fireball!")
         opponent.take_damage(damage,self)
         
-        
-    # 2. Freeze
+    # 2. Freeze - stops attack.
     def freeze(self, opponent):
         opponent.is_frozen = True
         print(f"\n{self.name} freezes {opponent.name}! They can't attack next turn!")
     
-        
 
-# Steps 1-2: Add 2 new character classes + 2 unique abilities for each.
-# + Create Archer class
+# 3. Archer class
 class Archer(Character):
     def __init__(self, name):
         super().__init__(name, 120, 30)
         
-      
-  # Unique abilities:
-    # 1. Quick Shot - double arrow attack. 
+    # 1. Quick Shot - double damage.
     def quick_shot(self, opponent):
         damage = self.attack_power * 2
         print(f"\n{self.name} uses Quick Shot!")
@@ -120,18 +107,16 @@ class Archer(Character):
         self.is_evading = True
         print(f"\n{self.name} will evade the next attack!")
 
-# + Create Paladin class 
+# 4. Paladin class 
 class Paladin(Character):
     def __init__(self, name):
         super().__init__(name, 170, 20)
 
-  # Unique abilities:
-    # 1. Holy Strike - bonus damage.
+    # 1. Holy Strike - adds bonus damage.
     def holy_strike(self, opponent):
         damage = self.attack_power + 10
         print(f"\n{self.name} uses Holy Strike!")
         opponent.take_damage(damage,self)
-      
       
     # 2. Divine Shield - blocks next attack.
     def divine_shield(self):
@@ -139,22 +124,24 @@ class Paladin(Character):
         print(f"\n{self.name} activates Divine Shield!")
   
   
-  # [EvilWizard class (inherits from Character)]
-
-# - (Step 6: Evil wizard logic): regenerate health & attack player after each turn.
+# EVIL WIZARD CLASS (enemy)
 class EvilWizard(Character):
     def __init__(self, name):
-        super().__init__(name, 150, 15)
-        
-
+        super().__init__(name, 150, 20)
+    
+    # Regenerates health after each turn.
     def regenerate(self):
         self.health = min(self.health + 5, self.max_health)
-        print(f"{self.name} regenerates 5 HP! (Current: {self.health}/{self.max_health})")
+        print(f"{self.name} regenerates 5 HP! (Current health: {self.health}/{self.max_health})")
         
   
-# [MENU SYSTEM]:
+# Welcome Message:
+print("=" * 60)
+print("DEFEAT THE EVIL WIZARD GAME")
+print("=" * 60)
 
-# !> 1. CREATE CHARACTER:
+# MENU SYSTEM: 
+# 1. Character Selection
 def create_character():
     print("\nChoose your character class:")
     print("1. Warrior")
@@ -165,11 +152,10 @@ def create_character():
     # KeyboardInterrup error catch:
     try:
         class_choice = input("\nEnter the number of your class choice: ")
-        
     except KeyboardInterrupt:
         print("\n\nGame interrupted. Goodbye!\n")
         exit()
-        
+     
     name = input("\nEnter your character's name: ")
     print("\n")
 
@@ -185,13 +171,14 @@ def create_character():
         print("\nInvalid choice. Defaulting to Warrior...\n")
         return Warrior(name)
       
-      
-# !> 2. BATTLE EVIL WIZARD:
+# BATTLE:
 def battle(player, wizard):
-    while wizard.health > 0 and player.health > 0:
     
-        wizard_action = False # wizard only acts if player attacks.
+    # Main Game Loop:
+    while wizard.health > 0 and player.health > 0:
+        wizard_action = False   # To ensure wizard only acts if player acts.
         
+        # Turn-based gameplay menu:
         print("\n=== YOUR TURN ===\n")
         print("1. Attack")
         print("2. Use Special Ability")
@@ -199,20 +186,16 @@ def battle(player, wizard):
         print("4. View Stats")
         
         choice = input("\nChoose an action: ")
-
-        # - (Step 5: Build Turn-Based Battle System):
         if choice == '1':
             print("\n")
             player.attack(wizard)
             separator()
             wizard_action = True
             
-        
-        # Implement Special Abilities:
         elif choice == '2':
             print("\n=== YOUR TURN ===\n")
           
-            # Warrior
+            # 1. Warrior abilities:
             if isinstance(player, Warrior):
                 print("1. Power Strike")
                 print("2. Berserk")
@@ -227,7 +210,7 @@ def battle(player, wizard):
                     separator()
                     wizard_action = True
                   
-            # Mage
+            # 2. Mage abilities:
             elif isinstance(player, Mage):
                 print("1. Fireball")
                 print("2. Freeze")
@@ -242,7 +225,7 @@ def battle(player, wizard):
                     separator()
                     wizard_action = True
           
-            # Archer
+            # 3. Archer abilities:
             elif isinstance(player, Archer):
                 print("1. Quick Shot")
                 print("2. Evade")
@@ -257,7 +240,7 @@ def battle(player, wizard):
                     separator()
                     wizard_action = True
                 
-            # Paladin
+            # 4. Paladin abilities:
             elif isinstance(player, Paladin):
                 print("1. Holy Strike")
                 print("2. Divine Shield")
@@ -271,15 +254,14 @@ def battle(player, wizard):
                     player.divine_shield()
                     separator()
                     wizard_action = True
-                  
+                 
             else: 
               print("\nInvalid ability choice. Try again...")
               
-        # = Implement Heal Method:    
         elif choice == '3':
-            
             player.heal()
             separator()
+            wizard_action = True  # wizard still takes its turn. 
           
         elif choice == '4':
             
@@ -289,8 +271,10 @@ def battle(player, wizard):
         else:
             print("\nInvalid choice. Try again...\n")
 
+        # GAME ENDS:
         if wizard_action and wizard.health > 0:
             
+            # freeze ability logic:
             if wizard.is_frozen:
                 print(f"{wizard.name} is frozen and cannot act!")
                 wizard.is_frozen = False
@@ -299,14 +283,9 @@ def battle(player, wizard):
                 wizard.regenerate()
                 wizard.attack(player)
                 wizard_action = False # reset
-            
-            # Show player stats after wizard's turn:
-            print(f"\n({player.name}'s current health: {player.health}/{player.max_health})")
-            
             separator()
         
-    
-# - (Step 7: Victory/Defeat Messages):
+        # VICTORY/DEFEAT MESSAGES:
         if player.health <= 0:
             print(f"\n\n\n======================== GAME OVER =========================\n")
             print(f"\n                {player.name} has been defeated!")
@@ -319,9 +298,6 @@ def battle(player, wizard):
             print("\n============================================================\n\n\n")
             break
             
-        
-
-    
 
 # !> MAIN FUNCTION:
 def main():
