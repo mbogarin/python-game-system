@@ -79,7 +79,7 @@ class Mage(Character):
     def __init__(self, name):
         super().__init__(name, 100, 35)
         
-    # 1. Fireball - strong attack.
+    # 1. Fireball - strong attacks.
     def fireball(self, opponent):
         damage = self.attack_power + 20
         print(f"\n{self.name} casts Fireball!")
@@ -136,8 +136,11 @@ class EvilWizard(Character):
         
   
 # Welcome Message:
+print("\n")
 print("=" * 60)
-print("DEFEAT THE EVIL WIZARD GAME")
+print("============================================================")
+print("                 DEFEAT THE EVIL WIZARD!")
+print("============================================================")
 print("=" * 60)
 
 # MENU SYSTEM: 
@@ -149,7 +152,7 @@ def create_character():
     print("3. Archer") 
     print("4. Paladin")  
 
-    # KeyboardInterrup error catch:
+    # KeyboardInterrupt error catch:
     try:
         class_choice = input("\nEnter the number of your class choice: ")
     except KeyboardInterrupt:
@@ -287,15 +290,14 @@ def battle(player, wizard):
         
         # VICTORY/DEFEAT MESSAGES:
         if player.health <= 0:
-            print(f"\n\n\n======================== GAME OVER =========================\n")
-            print(f"\n                {player.name} has been defeated!")
-            print("\n============================================================\n\n\n")
+            print(f"\n{player.name} has been defeated! Better luck next time!")
+            print(f"\n\n======================== GAME OVER =========================\n\n\n")
             break
 
         elif wizard.health <= 0:
-            print(f"\n\n\n======================== GAME OVER =========================\n")
-            print(f"     Victory! {wizard.name} has been defeated by {player.name}!")
-            print("\n============================================================\n\n\n")
+            print(f"\nVICTORY! {wizard.name} has been defeated by {player.name}!")
+            print(f"\n\n======================== GAME OVER =========================\n\n\n")
+
             break
             
 
